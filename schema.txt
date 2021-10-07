@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Users {
+  id            Int      @id @default(autoincrement())
+  discordId     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  discordTag    String
+  email         String
+  avatar        String
+  discriminator String
+  Guilds        Guilds[]
+}
+
+model Guilds {
+  id               Int                @id @default(autoincrement())
+  guildId          String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  user             Users              @relation(fields: [invitedBy], references: [discordId])
+  invitedBy        String 
+  prefix           String             @db.VarChar(10)
+  logChannel       String
+  Banned_users     Banned_users[]
+  staffMembers     staffMembers[]
+  warnedUsers      warnedUsers[]
+  BirthDays        BirthDays[]
+  BirthDayMessages BirthDayMessages[]
+}
+
+model Banned_users {
+  id        Int      @id @default(autoincrement())
+  discordId String
+  guildId   String
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  reason    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bannedBy  String
+  staff     Members  @relation(fields: [bannedBy], references: [discordId])
+}
+
+model Members {
+  id               Int                @id @default(autoincrement())
+  discordId        String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  discordTag       String
+  discriminator    String
+  Banned_users     Banned_users[]
+  staffMembers     staffMembers[]
+  warnedUsers      warnedUsers[]
+  BirthDays        BirthDays[]
+  BirthDayMessages BirthDayMessages[]
+}
+
+model staffMembers {
+  id         Int      @id @default(autoincrement())
+  discordId  String
+  user       Members  @relation(fields: [discordId], references: [discordId])
+  guildId    String
+  guild      Guilds   @relation(fields: [guildId], references: [guildId])
+  promotedBy String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model warnedUsers {
+  id        Int      @id @default(autoincrement())
+  discordId String
+  user      Members  @relation(fields: [discordId], references: [discordId])
+  guildId   String
+  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  reason    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BirthDays {
+  id        Int              @id @default(autoincrement())
+  discordId String
+  user      Members          @relation(fields: [discordId], references: [discordId])
+  guildId   String
+  guild     Guilds           @relation(fields: [guildId], references: [guildId])
+  birthdate DateTime
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  msgId     Int
+  msg       BirthDayMessages @relation(fields: [msgId], references: [id])
+}
+
+model BirthDayMessages {
+  id          Int         @id @default(autoincrement())
+  author      String
+  user        Members     @relation(fields: [author], references: [discordId])
+  guildId     String
+  guild       Guilds      @relation(fields: [guildId], references: [guildId])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  msg_content String
+  BirthDays   BirthDays[]
+}
