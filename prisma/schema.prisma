@@ -53,30 +53,34 @@ model Banned_users {
 }
 
 model Temp_Banned_users {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   discordId String
   guildId   String
-  guild     Guilds   @relation(fields: [guildId], references: [guildId])
+  guild     Guilds       @relation(fields: [guildId], references: [guildId])
   duration  String
-  reason    String?  @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bannedBy  String
-  staff     Members  @relation(fields: [bannedBy], references: [discordId])
+  reason    String?      @db.LongText
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  bannedBy  Int
+  staff     staffMembers @relation(fields: [bannedBy], references: [id])
+  Members   Members?     @relation(fields: [membersId], references: [id])
+  membersId Int?
 }
 
 model muted_users {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   discordId String
   guildId   String
-  guild     Guilds   @relation(fields: [guildId], references: [guildId])
-  reason    String?  @db.LongText
+  guild     Guilds       @relation(fields: [guildId], references: [guildId])
+  reason    String?      @db.LongText
   duration  String?
-  roles     String   @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  roles     String       @db.LongText
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   mutedBy   Int
-  staff     Members  @relation(fields: [mutedBy], references: [id])
+  staff     staffMembers @relation(fields: [mutedBy], references: [id])
+  Members   Members?     @relation(fields: [membersId], references: [id])
+  membersId Int?
 }
 
 model Members {
@@ -96,14 +100,16 @@ model Members {
 }
 
 model staffMembers {
-  id         Int      @id @default(autoincrement())
-  discordId  String
-  user       Members  @relation(fields: [discordId], references: [discordId])
-  guildId    String
-  guild      Guilds   @relation(fields: [guildId], references: [guildId])
-  promotedBy String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                Int                 @id @default(autoincrement())
+  discordId         String
+  user              Members             @relation(fields: [discordId], references: [discordId])
+  guildId           String
+  guild             Guilds              @relation(fields: [guildId], references: [guildId])
+  promotedBy        String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  Temp_Banned_users Temp_Banned_users[]
+  muted_users       muted_users[]
 }
 
 model warnedUsers {
@@ -113,7 +119,6 @@ model warnedUsers {
   guildId   String
   guild     Guilds   @relation(fields: [guildId], references: [guildId])
   reason    String?  @db.LongText
-  warnCount Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

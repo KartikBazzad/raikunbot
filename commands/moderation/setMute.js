@@ -1,40 +1,34 @@
 const {
   MessageActionRow,
   MessageSelectMenu,
-  MessageEmbed,
 } = require('discord.js/src/index.js');
 const { PrismaClient } = require('@prisma/client');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'logs-channel-set',
-  aliases: ['setlogs', 'logset'],
-  description: 'Set a channel for Server Log',
+  name: 'setmute',
   guildOnly: true,
-  usage: 'logset #channel',
+  aliases: ['smute', 'createmute', 'cmute'],
+  description: 'create/set/update a mute role',
   async execute(message, args, cmd, client, Discord) {
     try {
-      const staffmember = await staffMembers.findFirst({
-        where: {
-          guildId: message.guild.id,
-          discordId: message.author.id,
-        },
+      const staff = await staffMembers.findFirst({
+        where: { discordId: message.author.id, guildId: message.guild.id },
       });
-      if (!staffmember) {
-        return message.reply(`You don't have permissions to do this`);
-      }
-      const embed = new MessageEmbed().setTitle('Set Log Channel');
+
+      if (!staff)
+        return message.reply('You are not authorized to use this Command');
+      const roles = message.guild.roles.cache;
+
       const menu = new MessageSelectMenu()
         .setCustomId('select')
-        .setPlaceholder('Select Log Channel');
+        .setPlaceholder('Select Mute Role');
       const menuoptions = [];
-      const channels = message.guild.channels.cache;
-      console.log(channels);
-      channels
-        .filter((ch) => ch.type === 'GUILD_TEXT')
-        .map((ch) => {
+      roles
+        .filter((role) => role.tags === null)
+        .map((role) => {
           const option = {
-            value: ch.id,
-            label: ch.name,
+            label: role.name,
+            value: role.id,
           };
           menuoptions.push(option);
         });
@@ -52,15 +46,14 @@ module.exports = {
         const guildupdate = await guilds.update({
           where: { guildId: message.guild.id },
           data: {
-            logChannel: value,
+            muteRole: value,
           },
         });
-        collected.reply(`<#${value}> has been selected as Log Channel`);
+        collected.reply(`The Role <@${value}> has been set as mute role`);
       });
-      message.reply({ embeds: [embed], components: [row] });
+      message.reply({ content: 'Select Channel', components: [row] });
     } catch (error) {
       console.log(error);
-      message.reply('error occured, pls try again later');
     }
   },
 };

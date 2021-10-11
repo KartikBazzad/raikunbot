@@ -28,14 +28,12 @@ module.exports = {
           discordId: target.id,
         },
       });
-      const warnings = await warnedUsers.findFirst({
+      const warnings = await warnedUsers.count({
         where: {
           guildId: message.guild.id,
           discordId: target.id,
         },
       });
-      // console.log(new Date(user.createdTimestamp));
-      // console.log(new Date(u.joinedTimestamp));
       const embed = new MessageEmbed()
         .setTitle(target.username)
         .setDescription(`<@${target.id}>`)
@@ -50,7 +48,7 @@ module.exports = {
       if (!warnings) {
         embed.addField('Server Warnings', `0`);
       } else {
-        embed.addField('Server Warnings', `${warnings.warnCount}`);
+        embed.addField('Server Warnings', `${warnings}`);
       }
       if (u.premiumSinceTimestamp != null) {
         embed.addField(
