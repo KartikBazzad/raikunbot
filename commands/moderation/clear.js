@@ -83,7 +83,6 @@ module.exports = {
               .catch((err) => console.log(err));
             break;
           case 'cancel':
-            console.log('Operation canceled');
             reply.delete();
             collected.reply('Operation was canceled');
             break;

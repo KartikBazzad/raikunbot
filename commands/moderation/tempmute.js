@@ -19,6 +19,9 @@ module.exports = {
       const target = message.mentions.members.first();
       if (!target) return message.reply('Tag the user you want to mute');
 
+      if (!args[1]) {
+        return message.reply('Please specify the time');
+      }
       const guild = await guilds.findUnique({
         where: { guildId: message.guild.id },
       });
@@ -28,85 +31,28 @@ module.exports = {
           'Mute role not found, please set the mute role using the setmute command',
         );
       }
-      const muterole = await message.guild.roles.cache.find(
-        (role) => role.id === muteRole,
-      );
+      const muterole = await message.guild.roles.fetch(muteRole);
+      console.log(muterole);
       if (!muterole)
         return message.reply(
           'Mute role not found, please set the mute role using the setmute command',
         );
-      if (!args[1]) {
-        args[1] = 'No reason Specified';
+      if (!args[2]) {
+        args[2] = 'No reason Specified';
       } else {
-        args[1] = args.slice(1).join(' ');
+        args[2] = args.slice(2).join(' ');
       }
-      const user = message.guild.members.cache.get(target.id);
-      const btn1 = new MessageButton()
-        .setCustomId('1hr')
-        .setLabel('1Hr')
+      const user = await message.guild.members.cache.get(target.id);
+      const muteBtn = new MessageButton()
+        .setCustomId('mute')
+        .setLabel('Mute')
         .setStyle('PRIMARY');
-      const btn2 = new MessageButton()
-        .setCustomId('6hr')
-        .setLabel('6Hr')
-        .setStyle('PRIMARY');
-      const btn3 = new MessageButton()
-        .setCustomId('12hr')
-        .setLabel('12Hr')
-        .setStyle('PRIMARY');
-      const btn4 = new MessageButton()
-        .setCustomId('1d')
-        .setLabel('1D')
-        .setStyle('PRIMARY');
-      const btn5 = new MessageButton()
-        .setCustomId('2d')
-        .setLabel('2D')
-        .setStyle('PRIMARY');
-      const btn6 = new MessageButton()
-        .setCustomId('3d')
-        .setLabel('3D')
-        .setStyle('PRIMARY');
-      const btn7 = new MessageButton()
-        .setCustomId('7d')
-        .setLabel('7D')
-        .setStyle('PRIMARY');
-      const btn8 = new MessageButton()
-        .setCustomId('15d')
-        .setLabel('15D')
-        .setStyle('PRIMARY');
-      const btn9 = new MessageButton()
-        .setCustomId('10m')
-        .setLabel('10m')
-        .setStyle('PRIMARY');
-      const btn10 = new MessageButton()
-        .setCustomId('15min')
-        .setLabel('15min')
-        .setStyle('PRIMARY');
-      const btn11 = new MessageButton()
-        .setCustomId('30min')
-        .setLabel('30min')
-        .setStyle('PRIMARY');
-      const btn12 = new MessageButton()
-        .setCustomId('45min')
-        .setLabel('45min')
-        .setStyle('PRIMARY');
-      const minRow = new MessageActionRow().addComponents([
-        btn9,
-        btn10,
-        btn11,
-        btn12,
-      ]);
-      const hourRow = new MessageActionRow().addComponents([
-        btn1,
-        btn2,
-        btn3,
-        btn4,
-      ]);
-      const daysRow = new MessageActionRow().addComponents([
-        btn5,
-        btn6,
-        btn7,
-        btn8,
-      ]);
+      const cancelBtn = new MessageButton()
+        .setCustomId('cancel')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY');
+      const minRow = new MessageActionRow().addComponents([muteBtn, cancelBtn]);
+
       const embed = new MessageEmbed()
         .setTitle('Mute Member')
         .setAuthor(
@@ -121,7 +67,7 @@ module.exports = {
           },
           {
             name: 'Reason: ',
-            value: `-${args[1]}`,
+            value: `-${args[2]}`,
           },
         ])
         .setFooter(message.guild.name, message.guild.iconURL())
@@ -129,7 +75,7 @@ module.exports = {
       const reply = await message.reply({
         content: 'Click the button to ban the user for specified time',
         embeds: [embed],
-        components: [minRow, hourRow, daysRow],
+        components: [minRow],
       });
 
       const filter = (interaction) =>
@@ -143,16 +89,19 @@ module.exports = {
         switch (customId) {
           case 'cancel':
             collected.reply('Operation Canceled');
+            reply.delete;
             break;
           default:
-            embed.addField(`Duration`, `${ms(ms(customId), { long: true })}`);
+            embed.addField(`Duration`, `${ms(ms(args[1]), { long: true })}`);
             const roles = [];
             try {
               user.roles.cache.map((role) => {
+                if (role.name === '@everyone') return;
                 roles.push(role.id);
                 user.roles.remove(role.id);
               });
-              user.roles.add(muterole);
+              console.log(roles);
+              user.roles.add(muteRole);
             } catch (error) {
               console.log(error);
             }
@@ -161,14 +110,15 @@ module.exports = {
                 discordId: target.id,
                 guildId: `${guild.guildId}`,
                 roles: `${roles.join('|')}`,
-                reason: args[1],
-                duration: ms(ms(customId), { long: true }),
+                reason: args[2],
+                duration: ms(ms(args[1]), { long: true }),
                 mutedBy: staff.id,
               },
             });
             collected.reply(
-              'User muted for ' + ms(ms(customId), { long: true }),
+              'User muted for ' + ms(ms(args[1]), { long: true }),
             );
+
             if (!logChannel) {
               return;
             } else {
@@ -176,17 +126,25 @@ module.exports = {
               logchannel.send({ embeds: [embed] });
             }
             setTimeout(() => {
-              user.roles.remove(muterole);
-              member.roles.split(/|/g).map((x) => {
-                const role = message.guild.roles.cache.find(
-                  (role) => role.id === x,
-                );
-                user.roles.add(role);
+              reply.delete();
+            }, 3000);
+            setTimeout(async () => {
+              user.roles.remove(muteRole);
+              console.log(member.roles);
+              member.roles.split('|').map((x) => {
+                console.log(x);
+                user.roles.add(x);
               });
+              const deleteUserFromDB = await muted_users.delete({
+                where: {
+                  id: member.id,
+                },
+              });
+              console.log(`member deleted from db and has been unmuted`);
               message.channel.send(
                 `User: ${target} has been unmuted successfully`,
               );
-            }, ms(customId));
+            }, ms(args[1]));
         }
       });
     } catch (error) {

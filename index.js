@@ -19,10 +19,17 @@ client.commands = new Collection();
 
 client.on('messageCreate', (message) => {
   // const online = message.guild.presences.cache.size;
-  const user = message.guild.members.cache.get(message.author.id);
-  user.user.use;
+  // const user = message.guild.members.cache.get(
+  //   message.mentions.members.first().id,
+  // );
   // const roles = [];
-  // user.roles.cache.map((key) => roles.push(key.id));
+  // user.roles.cache.map((key) => {
+  //   if (key.name === '@everyone') return;
+  //   roles.push(key.id);
+  //   user.roles.remove(key.id);
+  // });
+  // user.roles.add('896715607888764928');
+  // console.log(user.roles.cache.toJSON());
   // console.log(roles.join('|'));
   // message.guild.channels.cache.size;
   // const Textchannels = message.guild.channels.cache.filter(
