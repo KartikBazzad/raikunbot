@@ -22,6 +22,15 @@ module.exports = {
       if (!args[1]) {
         return message.reply('Please specify the time');
       }
+      const targetIsStaff = await staffMembers.findFirst({
+        where: {
+          discordId: target.id,
+          guildId: message.guild.id,
+        },
+      });
+      if (targetIsStaff) {
+        return message.reply('Tagged user can not be muted');
+      }
       const guild = await guilds.findUnique({
         where: { guildId: message.guild.id },
       });
@@ -38,7 +47,7 @@ module.exports = {
           'Mute role not found, please set the mute role using the setmute command',
         );
       if (!args[2]) {
-        args[2] = 'No reason Specified';
+        args[2] = 'Reason not Specified';
       } else {
         args[2] = args.slice(2).join(' ');
       }
@@ -100,8 +109,14 @@ module.exports = {
                 roles.push(role.id);
                 user.roles.remove(role.id);
               });
-              console.log(roles);
               user.roles.add(muteRole);
+              message.guild.channels.cache.map((ch) => {
+                ch.permissionOverwrites.edit(user.id, {
+                  CONNECT: false,
+                  SEND_MESSAGES: false,
+                  VIEW_CHANNEL: true,
+                });
+              });
             } catch (error) {
               console.log(error);
             }
@@ -131,10 +146,19 @@ module.exports = {
             setTimeout(async () => {
               user.roles.remove(muteRole);
               console.log(member.roles);
-              member.roles.split('|').map((x) => {
-                console.log(x);
-                user.roles.add(x);
+              message.guild.channels.cache.map((ch) => {
+                ch.permissionOverwrites.edit(user.id, {
+                  CONNECT: true,
+                  SEND_MESSAGES: true,
+                  VIEW_CHANNEL: true,
+                });
               });
+              if (member.roles.length >= 1) {
+                member.roles.split('|').map((x) => {
+                  console.log(x);
+                  user.roles.add(x);
+                });
+              }
               const deleteUserFromDB = await muted_users.delete({
                 where: {
                   id: member.id,

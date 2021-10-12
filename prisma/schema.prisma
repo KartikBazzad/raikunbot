@@ -41,15 +41,16 @@ model Guilds {
 }
 
 model Banned_users {
-  id        Int      @id @default(autoincrement())
-  discordId String
-  guildId   String
-  guild     Guilds   @relation(fields: [guildId], references: [guildId])
-  reason    String?  @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bannedBy  Int
-  staff     Members  @relation(fields: [bannedBy], references: [id])
+  id         Int      @id @default(autoincrement())
+  discordId  String
+  discordTag String
+  guildId    String
+  guild      Guilds   @relation(fields: [guildId], references: [guildId])
+  reason     String?  @db.LongText
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  bannedBy   Int
+  staff      Members  @relation(fields: [bannedBy], references: [id])
 }
 
 model Temp_Banned_users {

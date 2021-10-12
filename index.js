@@ -7,6 +7,7 @@ const client = new Client({
     Intents.FLAGS.DIRECT_MESSAGES,
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILD_PRESENCES,
+    Intents.FLAGS.GUILD_BANS,
   ],
 });
 
@@ -17,7 +18,29 @@ client.commands = new Collection();
   require(`./handlers/${handler}`)(client, Discord);
 });
 
-client.on('messageCreate', (message) => {
+client.on('messageCreate', async (message) => {
+  // const user = message.mentions.members.first();
+  // message.guild.channels.cache.map((ch) => {
+  //   ch.permissionOverwrites.edit(user.id, {
+  //     CONNECT: true,
+  //     SEND_MESSAGES: true,
+  //     VIEW_CHANNEL: true,
+  //   });
+  // });
+  // console.log('Changed permissions for user');
+  // const banAuditLogs = await message.guild.fetchAuditLogs({
+  //   type: 'MEMBER_BAN_ADD',
+  // });
+  // const bans = await message.guild.bans.fetch();
+  // console.log(bans.size);
+  // bans.map((user) => console.log(user.user, user.reason));
+  // const userArray = [];
+  // banAuditLogs.entries.first()
+  // banAuditLogs.entries.map((x) => {
+  //   const { executor, target } = x;
+  //   userArray.push(x);
+  // });
+  // console.log(userArray);
   // const online = message.guild.presences.cache.size;
   // const user = message.guild.members.cache.get(
   //   message.mentions.members.first().id,
