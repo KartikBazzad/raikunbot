@@ -1,9 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const { staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'staffadd',
-  description: 'Add a user to Staff Members',
-  aliases: ['sadd'],
+  name: 'Staffadd',
+  guildOnly: true,
+  summary: 'Add a user to Staff Members',
+  description:
+    'With this command users can add members for staff, and give them access to the bot commands, Only users with ADMINISTRATOR can promote and demote members to staff, Only one user can be promoted with each command usage',
+  aliases: ['sadd', 'addstaff', 'astaff'],
+  usage: ['user'],
+  example: ['staffadd [user]', 'addstaff [user]'],
   Permissions: ['ADMINISTRATOR'],
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -21,7 +26,13 @@ module.exports = {
         },
       });
       if (newmember) {
-        return message.reply('This user is already a Staff member');
+        const updatemember = await staffMembers.update({
+          where: { id: newmember.id },
+          data: {
+            active: true,
+          },
+        });
+        return message.reply('User Promoted Successfully');
       } else {
         const newStaffMember = await staffMembers.create({
           data: {

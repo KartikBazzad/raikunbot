@@ -3,9 +3,13 @@ const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'removelogchannel',
   aliases: ['removelogs', 'logremove'],
-  description: 'Remove Server log Channel',
+  summary: 'Remove Server log Channel',
+  description:
+    'Remove server log channel from the settings. This will stop logging events into the guild',
+  staffOnly: true,
   guildOnly: true,
-  usage: 'removelogs #channel',
+  usage: [''],
+  example: ['removelogchannel'],
   async execute(message, args, cmd, client, Discord) {
     try {
       const staffmember = await staffMembers.findFirst({
@@ -14,10 +18,11 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staffmember) {
-        return message.reply(`You don't have permissions to do this`);
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
       }
-      const channelId = args[0].replace(/[#<>]/g, '');
       const Guild = await guilds.findUnique({
         where: { guildId: message.guild.id },
       });
@@ -26,9 +31,7 @@ module.exports = {
           where: { guildId: message.guild.id },
           data: { logChannel: null },
         });
-        message.reply(
-          `Successfully removed the <#${channelId}> as Log Channel`,
-        );
+        message.reply(`Successfully removed the Log Channel`);
       }
     } catch (error) {
       console.log(error);

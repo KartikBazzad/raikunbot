@@ -11,9 +11,13 @@ const {
 module.exports = {
   name: 'unban',
   aliases: ['ub'],
+  staffOnly: true,
   guildOnly: true,
-  description: 'unban members',
-  example: ['.unban <userid>', '.ub <userid>'],
+  summary: 'unban member from the guild',
+  description:
+    'This command can be used to unban users from the ban list, When command is executed, you will see a list of banned users, select the user you want to unban, if the List of banned users is higher then it will divide the banned user list in groups and display the groups',
+  example: ['unban', 'ub'],
+  usage: [''],
   async execute(message, args, cmd, client, discord) {
     try {
       // if (!args.length)
@@ -22,8 +26,11 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
       const embed = new MessageEmbed()
         .setAuthor(message.guild.name, message.guild.iconURL())
         .setDescription(

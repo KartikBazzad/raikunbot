@@ -3,7 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'server',
-  discription: 'Display Server Info',
+  summary: 'Display Server Info',
+  description: 'Display the server info',
   aliases: ['sinfo'],
   async execute(message, args, cmd, client, Discord) {
     try {

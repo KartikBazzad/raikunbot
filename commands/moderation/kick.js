@@ -3,8 +3,13 @@ const { MessageEmbed } = require('discord.js');
 const { staffMembers, guilds } = new PrismaClient();
 module.exports = {
   name: 'kick',
+  staffOnly: true,
   guildOnly: true,
-  description: 'Kick user from the guild',
+  summary: 'Kick user from the guild',
+  description:
+    'Kick a user from the guild, You need to be a staff member or ADMIN perms',
+  usage: ['[user]'],
+  example: ['kick [user]'],
   async execute(message, args, cmd, client, Discord) {
     try {
       if (!args.length) return message.reply('Tag the user you want to kick');
@@ -12,8 +17,11 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
       const target = message.mentions.members.first();
       console.log(target);
       const targetUser = client.users.cache.get(target.id);

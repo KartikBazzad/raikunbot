@@ -4,7 +4,10 @@ const { staffMembers, warnedUsers } = new PrismaClient();
 module.exports = {
   name: 'user',
   aliases: ['user-info'],
-  description: 'Display information for a specified user',
+  summary: 'Display information for a specified user',
+  description:
+    'This command displays user information on that server, this includes warnings and join date etc',
+  staffOnly: true,
   guildOnly: true,
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -14,8 +17,10 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staffmember) {
-        return message.reply(`You don't have permissions to do this`);
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
       }
 
       const target = message.mentions.users.first();

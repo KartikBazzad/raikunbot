@@ -5,18 +5,26 @@ const {
 const { PrismaClient } = require('@prisma/client');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'setmute',
+  name: 'Setmute',
+  staffOnly: true,
   guildOnly: true,
   aliases: ['smute', 'createmute', 'cmute'],
-  description: 'create/set/update a mute role',
+  summary: 'Set a mute role',
+  description:
+    'This commands let you select a role which can be given to muted person on the server, the mute role helps in distinguishing muted members from others',
+  usage: [''],
+  example: ['setmute'],
   async execute(message, args, cmd, client, Discord) {
     try {
       const staff = await staffMembers.findFirst({
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
       const roles = message.guild.roles.cache;
 
       const menu = new MessageSelectMenu()

@@ -1,9 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
 const { staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'staffremove',
-  description: 'Remove an user from Staff Members',
-  aliases: ['sremove', 'srmv'],
+  name: 'Staffremove',
+  summary: 'Demote an user from Staff Members',
+  guildOnly: true,
+  description:
+    'Demote an user from the staff members, You will need to have ADMINISTRATOR permissions to demote a member',
+  usage: ['[user]'],
+  example: ['staffremove [user]', 'sremove [user]', 'srmv [user]'],
+  aliases: ['sremove', 'srmv', 'removestaff'],
   Permissions: ['ADMINISTRATOR'],
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -25,9 +30,12 @@ module.exports = {
       if (!newmember) {
         return message.reply('This user is not a Staff member');
       } else {
-        const newStaffMember = await staffMembers.delete({
+        const newStaffMember = await staffMembers.update({
           where: {
             id: newmember.id,
+          },
+          data: {
+            active: false,
           },
         });
         return message.reply('User Demoted From Staff Member successfully');

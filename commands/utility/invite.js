@@ -2,6 +2,7 @@ const { MessageActionRow, MessageButton } = require('discord.js/src/index.js');
 
 module.exports = {
   name: 'invite',
+  summary: 'Get guild and bot invite links',
   description: 'Provide a link for Server Invite and Bot invite',
   async execute(message, args, cmd, client, Discord) {
     try {

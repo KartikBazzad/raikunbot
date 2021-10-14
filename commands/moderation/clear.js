@@ -7,9 +7,15 @@ const {
 } = require('discord.js/src/index.js');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'clear',
-  description: 'Clear a desired amount of messages from the channels',
+  name: 'Clear',
+  summary: 'Clear a desired amount of messages from the channels',
+  description:
+    'Clear a desired amount of messages from the channel \n if the message amount to be deleted is not specified then it will clear 100 messages by default',
+  staffOnly: true,
   guildOnly: true,
+  aliases: ['purge'],
+  usage: ['', 20],
+  example: ['clear 20', 'clear'],
   async execute(message, args, cmd, client, Discord) {
     try {
       const staffmember = await staffMembers.findFirst({
@@ -18,8 +24,10 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staffmember) {
-        return message.reply(`You don't have permissions to do this`);
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
       }
       const btn1 = new MessageButton()
         .setLabel('Delete')

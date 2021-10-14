@@ -8,14 +8,28 @@ const { guilds, staffMembers, muted_users } = new PrismaClient();
 const ms = require('ms');
 module.exports = {
   name: 'tempmute',
-  description: 'Mute a user for a specified time',
+  aliases: ['tmute', 'tempm'],
+  description:
+    'Mute a user for specified time, this will remove permissions to send message from the user, the user can still view all the channels but wont be able to send messages in the channel, to unmute the user use unmute command',
+  summary: 'Mute a user for a specified time',
+  usage: ['[user] [duration] [reason]'],
+  example: [
+    '.tempmute [user] 5min spamming chat',
+    '.tmute [user] 2hr spamming chat',
+    '.tempm [user] 7d spamming chat',
+  ],
+  guildOnly: true,
+  staffOnly: true,
   async execute(message, args, cmd, client, Discord) {
     try {
       const staff = await staffMembers.findFirst({
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
       const target = message.mentions.members.first();
       if (!target) return message.reply('Tag the user you want to mute');
 
@@ -127,7 +141,7 @@ module.exports = {
                 roles: `${roles.join('|')}`,
                 reason: args[2],
                 duration: ms(ms(args[1]), { long: true }),
-                mutedBy: staff.id,
+                mutedBy: message.author.id,
               },
             });
             collected.reply(

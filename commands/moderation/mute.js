@@ -2,12 +2,16 @@ const { PrismaClient } = require('@prisma/client');
 const { muted_users, guilds, banned_users, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'mute',
-  description: 'Mute a specific user',
+  description:
+    'Mute a user for Server, this will remove permissions to send message from the user, the user can still view all the channels but wont be able to send messages in the channel, to unmute the user use unmute command',
+  summary: 'Mute a user from the server',
+  usage: ['[user] [reason]'],
+  example: ['mute [user] spamming chat'],
+  staffOnly: true,
   guildOnly: true,
   async execute(message, args, cmd, client, Discord) {
     try {
       if (!args.length) return message.reply('Tag the user you want to mute');
-      const muteTarget = message.mentions.members.first();
       const staff = await staffMembers.findFirst({
         where: {
           discordId: message.author.id,
@@ -15,8 +19,12 @@ module.exports = {
         },
       });
 
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
+      const muteTarget = message.mentions.members.first();
       const targetUser = message.guild.members.cache.get(muteTarget.id);
       if (!targetUser) {
         return message.reply('Cant find this user');

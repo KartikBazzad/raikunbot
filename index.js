@@ -19,6 +19,12 @@ client.commands = new Collection();
 });
 
 client.on('messageCreate', async (message) => {
+  const user = message.guild.members.cache.get(message.author.id);
+  if (user.permissions.has(['ADMINISTRATOR'])) {
+    console.log('true');
+  } else {
+    console.log(false);
+  }
   // const user = message.mentions.members.first();
   // message.guild.channels.cache.map((ch) => {
   //   ch.permissionOverwrites.edit(user.id, {

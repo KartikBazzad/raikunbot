@@ -41,16 +41,16 @@ model Guilds {
 }
 
 model Banned_users {
-  id         Int      @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   discordId  String
   discordTag String
   guildId    String
-  guild      Guilds   @relation(fields: [guildId], references: [guildId])
-  reason     String?  @db.LongText
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  guild      Guilds       @relation(fields: [guildId], references: [guildId])
+  reason     String?      @db.LongText
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   bannedBy   Int
-  staff      Members  @relation(fields: [bannedBy], references: [id])
+  staff      staffMembers @relation(fields: [bannedBy], references: [id])
 }
 
 model Temp_Banned_users {
@@ -91,26 +91,28 @@ model Members {
   updatedAt         DateTime            @updatedAt
   discordTag        String
   discriminator     String
-  Banned_users      Banned_users[]
+  Temp_Banned_users Temp_Banned_users[]
+  muted_users       muted_users[]
   staffMembers      staffMembers[]
   warnedUsers       warnedUsers[]
   BirthDays         BirthDays[]
   BirthDayMessages  BirthDayMessages[]
-  muted_users       muted_users[]
-  Temp_Banned_users Temp_Banned_users[]
 }
 
 model staffMembers {
   id                Int                 @id @default(autoincrement())
   discordId         String
-  user              Members             @relation(fields: [discordId], references: [discordId])
   guildId           String
+  active            Boolean             @default(true)
   guild             Guilds              @relation(fields: [guildId], references: [guildId])
   promotedBy        String
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   Temp_Banned_users Temp_Banned_users[]
   muted_users       muted_users[]
+  Banned_users      Banned_users[]
+  Members           Members?            @relation(fields: [membersId], references: [id])
+  membersId         Int?
 }
 
 model warnedUsers {

@@ -5,6 +5,7 @@ const ms = require('ms');
 module.exports = {
   name: 'tempban',
   aliases: ['tban', 'tb'],
+  staffOnly: true,
   guildOnly: true,
   description: 'Ban members temporarily for a specific time duration',
   example: [
@@ -21,8 +22,11 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff)
-        return message.reply('You are not authorized to use this Command');
+      if (!staff) {
+        const staffUser = message.guild.members.cache.get(message.author.id);
+        if (!staffUser.permissions.has(['ADMINISTARTOR']))
+          return message.reply('You are not authorized to use this Command');
+      }
       const target = message.mentions.members.first();
       if (!target) return message.reply('Tag the user you want to ban');
 
