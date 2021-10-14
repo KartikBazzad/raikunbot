@@ -5,4 +5,4 @@ COPY package*.json ./
 COPY . .
 RUN npm install -g pm2
 RUN npm install
-CMD [ "npx prisma generate","&&", "pm2","start","index.js" ]
+CMD [ "npx prisma generate","&&", "pm2","start","index.js", "-i max" ]
