@@ -7,4 +7,4 @@ RUN npm install -g pm2
 COPY . .
 RUN npm install
 RUN npx prisma generate
-CMD ["pm2","start","index.js"]
+CMD ["node","index.js"]
