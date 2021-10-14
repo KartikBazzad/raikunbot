@@ -1,8 +1,10 @@
 FROM node:16
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /app
+WORKDIR /app
 COPY package*.json ./
+COPY prisma ./prisma/
 COPY . .
 RUN npm install -g pm2
 RUN npm install
-CMD [ "npx prisma generate","&&", "pm2-runtime","pm2","start","index.js", "-i max" ]
+RUN npx prisma generate
+CMD [ "pm2-runtime","pm2","start","index.js", "-i max" ]

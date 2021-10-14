@@ -8,7 +8,7 @@ module.exports = {
   name: 'Setmute',
   staffOnly: true,
   guildOnly: true,
-  aliases: ['smute', 'createmute', 'cmute'],
+  aliases: ['smute', 'setmute', 'muteset', 'createmute', 'cmute'],
   summary: 'Set a mute role',
   description:
     'This commands let you select a role which can be given to muted person on the server, the mute role helps in distinguishing muted members from others',

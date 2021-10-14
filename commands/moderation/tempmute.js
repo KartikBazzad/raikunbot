@@ -141,7 +141,7 @@ module.exports = {
                 roles: `${roles.join('|')}`,
                 reason: args[2],
                 duration: ms(ms(args[1]), { long: true }),
-                mutedBy: message.author.id,
+                mutedBy: staff.id,
               },
             });
             collected.reply(
