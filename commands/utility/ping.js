@@ -1,5 +1,8 @@
 module.exports = {
   name: 'ping',
+  aliases: ['botping'],
+  example: ['ping'],
+  usage: [],
   permissions: ['SEND_MESSAGES'],
   summary: `Check Bot's ping`,
   description: 'Check bot ping',

@@ -1,11 +1,41 @@
 require('dotenv').config;
 const { PrismaClient } = require('@prisma/client');
-const { members, staffMembers } = new PrismaClient();
+const { members, staffMembers, guilds, users } = new PrismaClient();
 const cooldowns = new Map();
 module.exports = async (Discord, client, message) => {
-  const prefix = process.env.PREFIX;
-  if (message.author.bot) return;
   try {
+    const guild = await guilds.findUnique({
+      where: { guildId: message.guild.id },
+    });
+    if (!guild) {
+      const fetchlogs = await message.guild
+        .fetchAuditLogs({ type: 'BOT_ADD' })
+        .entries.filter((log) => log.target.id === client.application.id)
+        .first();
+      const { executor, target } = fetchlogs;
+      const user = await users.findUnique({
+        where: { discordId: fetchlogs.executor.id },
+      });
+      if (!user) {
+        const createNewUser = await users.create({
+          data: {
+            discordId: fetchlogs.executor.id,
+            discordTag: executor.username + executor.discriminator,
+            avatar: executor.avatar,
+            discriminator: executor.discriminator,
+          },
+        });
+      }
+      const newguild = await guilds.create({
+        data: {
+          guildId: message.guild.id,
+          guildName: message.guild.name,
+          invitedBy: executor.id,
+        },
+      });
+    }
+    if (message.author.bot) return;
+    const prefix = process.env.PREFIX;
     const finduser = await members.findUnique({
       where: {
         discordId: message.author.id,
@@ -20,7 +50,6 @@ module.exports = async (Discord, client, message) => {
         },
       });
     }
-
     if (!message.content.startsWith(prefix)) return;
     const args = message.content.slice(prefix.length).split(/ +/);
     const cmd = args.shift().toLowerCase();

@@ -6,11 +6,13 @@ module.exports = {
   name: 'tempban',
   aliases: ['tban', 'tb'],
   staffOnly: true,
+  usage: [],
   guildOnly: true,
+  summary: 'Ban members temporarily',
   description: 'Ban members temporarily for a specific time duration',
   example: [
-    '.tempban @[user] [duration] [reason]',
-    '.tb @[user] [duration] [reason]',
+    'tempban @[user] [duration] [reason]',
+    'tb @[user] [duration] [reason]',
   ],
   async execute(message, args, cmd, client, discord) {
     try {
@@ -22,7 +24,7 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff) {
+      if (!staff.active || !staff) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');

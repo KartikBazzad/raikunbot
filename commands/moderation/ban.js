@@ -2,8 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const { MessageEmbed } = require('discord.js');
 const { staffMembers, guilds, banned_users } = new PrismaClient();
 module.exports = {
-  name: 'Ban',
+  name: 'ban',
   staffOnly: true,
+  aliases: [],
   guildOnly: true,
   summary: 'Ban user from the guild',
   description:
@@ -17,7 +18,7 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff) {
+      if (!staff || !staff.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');

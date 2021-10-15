@@ -73,8 +73,10 @@ module.exports = async (Discord, Client, guild) => {
       }
     }
     const embed = new MessageEmbed()
-      .setTitle('Thankyou')
-      .setDescription(`Thank you for Inviting the bot to ${guild.name}.`)
+      .setTitle(`Thank You`)
+      .setDescription(
+        `Hi this is your personal Moderation Bot. This bot contains a lot of features such as logging events, Kick, Ban, mute etc. Please use tutorial command : **tutorial** to get familiar with the bot`,
+      )
       .setFooter(`${Client.user.username}`)
       .setThumbnail(Client.user.displayAvatarURL({ dynamic: true }));
     const channel = await Client.channels.cache.get(guild.systemChannelId);

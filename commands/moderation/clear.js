@@ -3,18 +3,17 @@ const {
   MessageEmbed,
   MessageButton,
   MessageActionRow,
-  MessageCollector,
 } = require('discord.js/src/index.js');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'Clear',
+  name: 'clear',
   summary: 'Clear a desired amount of messages from the channels',
   description:
     'Clear a desired amount of messages from the channel \n if the message amount to be deleted is not specified then it will clear 100 messages by default',
   staffOnly: true,
   guildOnly: true,
   aliases: ['purge'],
-  usage: ['', 20],
+  usage: [20],
   example: ['clear 20', 'clear'],
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -24,7 +23,7 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staff) {
+      if (!staffmember || !staffmember.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');
@@ -81,12 +80,14 @@ module.exports = {
           case 'delete':
             console.log(args);
 
-            logChannel.send({ embeds: [embed] });
             await message.channel.messages
               .fetch({ limit: args[0] })
               .then((messages) => {
                 message.channel.bulkDelete(messages);
                 collected.reply('Operation Successfull');
+                if (logChannel) {
+                  return logChannel.send({ embeds: [embed] });
+                }
               })
               .catch((err) => console.log(err));
             break;

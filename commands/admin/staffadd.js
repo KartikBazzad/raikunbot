@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const { staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'Staffadd',
+  name: 'staffadd',
   guildOnly: true,
   summary: 'Add a user to Staff Members',
   description:

@@ -25,7 +25,7 @@ module.exports = {
       const staff = await staffMembers.findFirst({
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
-      if (!staff) {
+      if (!staff || !staff.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');
@@ -42,7 +42,7 @@ module.exports = {
           guildId: message.guild.id,
         },
       });
-      if (targetIsStaff) {
+      if (targetIsStaff.active) {
         return message.reply('Tagged user can not be muted');
       }
       const guild = await guilds.findUnique({

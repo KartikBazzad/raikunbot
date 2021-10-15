@@ -6,6 +6,8 @@ module.exports = {
   summary: 'Display Server Info',
   description: 'Display the server info',
   aliases: ['sinfo'],
+  usage: [],
+  example: ['server', 'sinfo'],
   async execute(message, args, cmd, client, Discord) {
     try {
       const Guild = await guilds.findUnique({
@@ -112,6 +114,7 @@ module.exports = {
       message.channel.send({ embeds: [embed] });
     } catch (err) {
       console.log(err);
+      message.reply('Error Occured, Dev team notified');
     }
   },
 };

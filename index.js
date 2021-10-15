@@ -8,6 +8,8 @@ const client = new Client({
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.GUILD_PRESENCES,
     Intents.FLAGS.GUILD_BANS,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_INVITES,
   ],
 });
 
@@ -19,12 +21,19 @@ client.commands = new Collection();
 });
 
 client.on('messageCreate', async (message) => {
-  const user = message.guild.members.cache.get(message.author.id);
-  if (user.permissions.has(['ADMINISTRATOR'])) {
-    console.log('true');
-  } else {
-    console.log(false);
-  }
+  // const user = message.guild.members.cache.get(message.author.id);
+  // if (user.permissions.has(['ADMINISTRATOR'])) {
+  //   console.log('true');
+  // } else {
+  //   console.log(false);
+  // }
+  // const fetchlogs = (
+  //   await message.guild.fetchAuditLogs({ type: 'BOT_ADD' })
+  // ).entries
+  //   .filter((log) => log.target.id === client.application.id)
+  //   .first();
+  // const { executor, target} = fetchlogs;
+  // console.log(fetchlogs);
   // const user = message.mentions.members.first();
   // message.guild.channels.cache.map((ch) => {
   //   ch.permissionOverwrites.edit(user.id, {

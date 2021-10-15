@@ -17,7 +17,7 @@ module.exports = {
   description:
     'This command can be used to unban users from the ban list, When command is executed, you will see a list of banned users, select the user you want to unban, if the List of banned users is higher then it will divide the banned user list in groups and display the groups',
   example: ['unban', 'ub'],
-  usage: [''],
+  usage: [],
   async execute(message, args, cmd, client, discord) {
     try {
       // if (!args.length)
@@ -26,7 +26,7 @@ module.exports = {
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
 
-      if (!staff) {
+      if (!staff || !staff.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');

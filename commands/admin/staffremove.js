@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const { staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'Staffremove',
+  name: 'staffremove',
   summary: 'Demote an user from Staff Members',
   guildOnly: true,
   description:

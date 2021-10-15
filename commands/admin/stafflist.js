@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const { MessageEmbed } = require('discord.js');
 const { guilds } = new PrismaClient();
 module.exports = {
-  name: 'Stafflist',
+  name: 'stafflist',
   guildOnly: true,
   summary: 'Display a list of staff members from a guild',
   description:

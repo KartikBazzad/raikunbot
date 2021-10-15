@@ -2,9 +2,11 @@ const { PrismaClient } = require('@prisma/client');
 const { MessageEmbed } = require('discord.js');
 const { staffMembers, warnedUsers } = new PrismaClient();
 module.exports = {
-  name: 'user',
-  aliases: ['user-info'],
+  name: 'user-info',
+  aliases: ['user', 'uinfo'],
   summary: 'Display information for a specified user',
+  usage: ['[user]'],
+  example: ['user [user]', 'uinfo [user]', 'user-info [user]'],
   description:
     'This command displays user information on that server, this includes warnings and join date etc',
   staffOnly: true,
@@ -45,7 +47,7 @@ module.exports = {
         .setAuthor(`Member Details`)
         .setColor('GOLD')
         .setThumbnail(`${user.displayAvatarURL()}`);
-      if (staff) {
+      if (staff && staff.active) {
         embed.addField('Server Permissions', 'Staff');
       } else {
         embed.addField('Server Permissions', 'Member');

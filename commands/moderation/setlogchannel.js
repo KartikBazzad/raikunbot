@@ -6,14 +6,14 @@ const {
 const { PrismaClient } = require('@prisma/client');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
-  name: 'Logchannelset',
+  name: 'logchannelset',
   aliases: ['setlogs', 'logset'],
   summary: 'Set a channel for Server Log',
   description:
     'This command let user to select a channel from the channel list to set channel for logging events such as Kick, Ban, Message Update, Mute etc..',
   staffOnly: true,
   guildOnly: true,
-  usage: [''],
+  usage: [],
   example: ['Logchannelset'],
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -23,7 +23,7 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staff) {
+      if (!staffmember || !staffmember.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');

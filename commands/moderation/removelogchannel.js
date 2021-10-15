@@ -2,13 +2,13 @@ const { PrismaClient } = require('@prisma/client');
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'removelogchannel',
-  aliases: ['removelogs', 'logremove'],
+  aliases: ['removelogs', 'logremove', 'logdel', 'ld', 'dl'],
   summary: 'Remove Server log Channel',
   description:
     'Remove server log channel from the settings. This will stop logging events into the guild',
   staffOnly: true,
   guildOnly: true,
-  usage: [''],
+  usage: [],
   example: ['removelogchannel'],
   async execute(message, args, cmd, client, Discord) {
     try {
@@ -18,7 +18,7 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staff) {
+      if (!staffmember || !staffmember.active) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');
