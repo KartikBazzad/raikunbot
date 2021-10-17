@@ -8,6 +8,7 @@ const {
   MessageEmbed,
   MessageButton,
 } = require('discord.js');
+const lodash = require('lodash');
 module.exports = {
   name: 'unban',
   aliases: ['ub'],
@@ -34,11 +35,13 @@ module.exports = {
       const embed = new MessageEmbed()
         .setAuthor(message.guild.name, message.guild.iconURL())
         .setDescription(
-          'The below list contain the list of banned members \n select a user to unban or click on the button to cancel the operation',
+          'The Groups below contain the list of banned members \n select a user to unban or click on the button to cancel the operation',
         )
         .setTimestamp()
         .setFooter(client.user.username, client.user.displayAvatarURL());
-      const banAuditLogs = await message.guild.bans.fetch();
+      const banAuditLogs = (await message.guild.bans.fetch()).toJSON();
+
+      console.log(typeof banAuditLogs);
       if (banAuditLogs.size === 0) {
         return message.reply('No member to unban');
       }
@@ -46,23 +49,37 @@ module.exports = {
         .setCustomId('cancel')
         .setLabel('cancel')
         .setStyle('PRIMARY');
+      const row2 = new MessageActionRow().addComponents(button);
       const menu = new MessageSelectMenu()
         .setCustomId('select')
-        .setPlaceholder('Select user to unban');
-      const userArray = [];
-      banAuditLogs.map((x) => {
-        userArray.push({
-          value: x.user.id,
-          description: `Reason: ${x.reason}`,
-          label: x.user.username + x.user.discriminator,
+        .setPlaceholder('Select a user to unban');
+      const chunks = lodash.chunk(banAuditLogs, 25);
+      const components = [row2];
+      chunks.map((chunk) => {
+        const userArray = [];
+        let menu = new MessageSelectMenu()
+          .setCustomId(`group-${chunks.indexOf(chunk) + 1}`)
+          .setPlaceholder(`group-${chunks.indexOf(chunk) + 1}`);
+
+        chunk.forEach((x) => {
+          userArray.push({
+            value: x.user.id,
+            description: `Reason: ${x.reason}`,
+            label: x.user.username + x.user.discriminator,
+          });
         });
+        menu.addOptions(userArray);
+        let row = new MessageActionRow().addComponents(menu);
+        components.push(row);
       });
-      menu.addOptions(userArray);
-      const row = new MessageActionRow().addComponents(menu);
-      const row2 = new MessageActionRow().addComponents(button);
+      console.log(components);
+      // banAuditLogs.map((x) => {
+      // });
+      // menu.addOptions(userArray);
+      // const row = new MessageActionRow().addComponents(menu);
       const reply = await message.reply({
         embeds: [embed],
-        components: [row, row2],
+        components: components,
       });
       const filter = (interaction) =>
         (interaction.isSelectMenu() || interaction.isButton()) &&

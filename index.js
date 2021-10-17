@@ -20,68 +20,127 @@ client.commands = new Collection();
   require(`./handlers/${handler}`)(client, Discord);
 });
 
-client.on('messageCreate', async (message) => {
-  // const user = message.guild.members.cache.get(message.author.id);
-  // if (user.permissions.has(['ADMINISTRATOR'])) {
-  //   console.log('true');
-  // } else {
-  //   console.log(false);
-  // }
-  // const fetchlogs = (
-  //   await message.guild.fetchAuditLogs({ type: 'BOT_ADD' })
-  // ).entries
-  //   .filter((log) => log.target.id === client.application.id)
-  //   .first();
-  // const { executor, target} = fetchlogs;
-  // console.log(fetchlogs);
-  // const user = message.mentions.members.first();
-  // message.guild.channels.cache.map((ch) => {
-  //   ch.permissionOverwrites.edit(user.id, {
-  //     CONNECT: true,
-  //     SEND_MESSAGES: true,
-  //     VIEW_CHANNEL: true,
-  //   });
-  // });
-  // console.log('Changed permissions for user');
-  // const banAuditLogs = await message.guild.fetchAuditLogs({
-  //   type: 'MEMBER_BAN_ADD',
-  // });
-  // const bans = await message.guild.bans.fetch();
-  // console.log(bans.size);
-  // bans.map((user) => console.log(user.user, user.reason));
-  // const userArray = [];
-  // banAuditLogs.entries.first()
-  // banAuditLogs.entries.map((x) => {
-  //   const { executor, target } = x;
-  //   userArray.push(x);
-  // });
-  // console.log(userArray);
-  // const online = message.guild.presences.cache.size;
-  // const user = message.guild.members.cache.get(
-  //   message.mentions.members.first().id,
-  // );
-  // const roles = [];
-  // user.roles.cache.map((key) => {
-  //   if (key.name === '@everyone') return;
-  //   roles.push(key.id);
-  //   user.roles.remove(key.id);
-  // });
-  // user.roles.add('896715607888764928');
-  // console.log(user.roles.cache.toJSON());
-  // console.log(roles.join('|'));
-  // message.guild.channels.cache.size;
-  // const Textchannels = message.guild.channels.cache.filter(
-  //   (c) => c.type === 'GUILD_TEXT',
-  // ).size;
-  // const voice = message.guild.channels.cache.filter(
-  //   (c) => c.type === 'GUILD_VOICE',
-  // ).size;
-  // const category = message.guild.channels.cache.filter(
-  //   (c) => c.type === 'GUILD_CATEGORY',
-  // ).size;
-  // console.log(client.application.id);
-  // console.log({ Textchannels, voice, category });
+const { PrismaClient } = require('@prisma/client');
+const { MessageEmbed } = require('discord.js');
+const { staffMembers, banned_users, guilds, temp_Banned_users, muted_users } =
+  new PrismaClient();
+const ms = require('ms');
+client.on('guildMemberAdd', async (member) => {
+  try {
+    const guild = await guilds.findUnique({
+      where: { guildId: member.guild.id },
+    });
+    const muted = await muted_users.findFirst({
+      where: { discordId: member.user.id, guildId: member.guild.id },
+    });
+
+    if (muted) {
+      const muteRole = member.guild.roles.cache.find(guild.muteRole);
+      if (muteRole) {
+        member.roles.add(muteRole.id);
+      }
+      member.guild.channels.cache.map((ch) => {
+        ch.permissionOverwrites.edit(user.id, {
+          CONNECT: false,
+          SEND_MESSAGES: false,
+          VIEW_CHANNEL: true,
+        });
+      });
+      if (muted.duration) {
+        setTimeout(() => {
+          member.guild.channels.cache.map((ch) => {
+            ch.permissionOverwrites.edit(user.id, {
+              CONNECT: true,
+              SEND_MESSAGES: true,
+              VIEW_CHANNEL: true,
+            });
+          });
+          member.roles.remove(muteRole.id);
+        }, ms(muted.duration));
+      }
+    }
+
+    const bannedUser = await banned_users.findFirst({
+      where: { discordId: member.user.id, guildId: member.guild.id },
+    });
+    if (bannedUser) {
+      const reason = 'Banned previously';
+      const bannedBy = await staffMembers.findUnique({
+        where: { id: bannedUser.bannedBy },
+      });
+      const staffUser = client.users.cache.get(bannedBy.discordId);
+      member.ban({ reason }).then(() => {
+        if (guild.logChannel !== null) {
+          const embed = new MessageEmbed()
+            .setAuthor(
+              member.user.username + member.user.discriminator,
+              member.user.displayAvatarURL(),
+            )
+            .setTitle('Member Banned Again')
+            .setDescription(
+              'User was banned previously by ' +
+                staffUser.username +
+                staffUser.discriminator,
+            )
+            .addField(
+              'Banned On',
+              '`' + bannedUser.createdAt.toLocaleDateString() + '`',
+            );
+          const logChannel = member.guild.channels.cache.get(guild.logChannel);
+          if (logChannel) {
+            logChannel.send({ embeds: [embed] });
+          }
+        }
+      });
+      return;
+    }
+    const tempbanned = await temp_Banned_users.findFirst({
+      where: { discordId: member.user.id, guildId: member.guild.id },
+    });
+    if (tempbanned) {
+      const reason = 'The user was Banned temporarily previously';
+      const bannedBy = await staffMembers.findUnique({
+        where: { id: tempbanned.bannedBy },
+      });
+      const staffUser = client.users.cache.get(bannedBy.discordId);
+      member.ban({ reason: reason }).then(() => {
+        if (tempbanned.duration) {
+          const embed = new MessageEmbed()
+            .setAuthor(
+              member.user.username + member.user.discriminator,
+              member.user.displayAvatarURL(),
+            )
+            .setTitle('Member Banned Again')
+            .setDescription(
+              'User was banned previously by ' +
+                staffUser.username +
+                staffUser.discriminator,
+            )
+            .addField('Previous Reason', tempbanned.reason)
+            .addField(
+              'Banned On',
+              '`' + bannedUser.createdAt.toLocaleDateString() + '`',
+            );
+          if (guild.logChannel !== null) {
+            const logChannel = member.guild.channels.cache.get(
+              guild.logChannel,
+            );
+            if (logChannel) {
+              logChannel.send({ embeds: [embed] });
+            }
+          }
+          setTimeout(() => {
+            member.guild.members.unban(member.id);
+          }, ms(tempbanned.duration));
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 });
+
+client.on('messageCreate', async (message) => {});
 
 client.on('ready', async () => {
   console.log(`Bot: ${client.user.username} is ready`);
