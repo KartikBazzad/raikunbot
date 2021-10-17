@@ -84,19 +84,4 @@ module.exports = async (Discord, Client, guild) => {
   } catch (error) {
     console.log(error);
   }
-
-  // const newuser = await users.create({
-  //   data: {
-  //     discordId: executor.id,
-  //     discordTag: `${executor.username}#${executor.discriminator}`,
-  //     avatar: executor.avatar,
-  //     discriminator: `${executor.discriminator}`,
-  //   },
-  // });
-  // const newguild = await guilds.create({
-  //   data: {
-  //     guildId: guild.id,
-  //     invitedBy: newuser.discordId,
-  //   },
-  // });
 };

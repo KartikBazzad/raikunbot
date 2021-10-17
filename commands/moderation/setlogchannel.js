@@ -22,6 +22,9 @@ module.exports = {
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');
       }
+      if (!args[0]) {
+        return message.reply('Please tag the channel or provide channel Id');
+      }
       const channelId = args[0].replace(/[#<>]/g, '');
       const Guild = await guilds.findUnique({
         where: { guildId: message.guild.id },
