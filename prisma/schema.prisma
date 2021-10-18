@@ -34,10 +34,9 @@ model Guilds {
   Banned_users      Banned_users[]
   staffMembers      staffMembers[]
   warnedUsers       warnedUsers[]
-  BirthDays         BirthDays[]
-  BirthDayMessages  BirthDayMessages[]
   muted_users       muted_users[]
   Temp_Banned_users Temp_Banned_users[]
+  GuildMemberLevels GuildMemberLevels[]
 }
 
 model Banned_users {
@@ -95,8 +94,7 @@ model Members {
   muted_users       muted_users[]
   staffMembers      staffMembers[]
   warnedUsers       warnedUsers[]
-  BirthDays         BirthDays[]
-  BirthDayMessages  BirthDayMessages[]
+  GuildMemberLevels GuildMemberLevels[]
 }
 
 model staffMembers {
@@ -113,42 +111,31 @@ model staffMembers {
   Banned_users      Banned_users[]
   Members           Members?            @relation(fields: [membersId], references: [id])
   membersId         Int?
+  warnedUsers       warnedUsers[]
 }
 
 model warnedUsers {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   discordId String
-  user      Members  @relation(fields: [discordId], references: [discordId])
+  warnid    String
+  warningby Int
+  user      staffMembers @relation(fields: [warningby], references: [id])
   guildId   String
-  guild     Guilds   @relation(fields: [guildId], references: [guildId])
-  reason    String?  @db.LongText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  guild     Guilds       @relation(fields: [guildId], references: [guildId])
+  reason    String?      @db.LongText
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  Members   Members?     @relation(fields: [membersId], references: [id])
+  membersId Int?
 }
 
-model BirthDays {
-  id        Int              @id @default(autoincrement())
-  discordId String
-  user      Members          @relation(fields: [discordId], references: [discordId])
-  guildId   String
-  guild     Guilds           @relation(fields: [guildId], references: [guildId])
-  birthdate DateTime
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  msgId     Int
-  msg       BirthDayMessages @relation(fields: [msgId], references: [id])
-}
-
-model BirthDayMessages {
-  id          Int         @id @default(autoincrement())
-  author      String
-  user        Members     @relation(fields: [membersId], references: [id])
-  guildId     String
-  guild       Guilds      @relation(fields: [guildsId], references: [id])
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  msg_content String
-  BirthDays   BirthDays[]
-  membersId   Int
-  guildsId    Int
+model GuildMemberLevels {
+  id         Int     @id @default(autoincrement())
+  discordId  String
+  member     Members @relation(fields: [discordId], references: [discordId])
+  guildId    String
+  guild      Guilds  @relation(fields: [guildId], references: [guildId])
+  level      Int     @default(1)
+  exp        BigInt  @default(0)
+  requiredXp BigInt  @default(100)
 }

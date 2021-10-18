@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const { MessageEmbed } = require('discord.js');
-const { staffMembers, warnedUsers } = new PrismaClient();
+const { staffMembers, warnedUsers, guildMemberLevels } = new PrismaClient();
 module.exports = {
   name: 'user-info',
   aliases: ['user', 'uinfo'],
@@ -19,7 +19,7 @@ module.exports = {
           discordId: message.author.id,
         },
       });
-      if (!staff) {
+      if (!staffmember) {
         const staffUser = message.guild.members.cache.get(message.author.id);
         if (!staffUser.permissions.has(['ADMINISTARTOR']))
           return message.reply('You are not authorized to use this Command');
@@ -41,6 +41,10 @@ module.exports = {
           discordId: target.id,
         },
       });
+      const userLevel = await guildMemberLevels.findFirst({
+        where: { discordId: target.id, guildId: message.guild.id },
+      });
+
       const embed = new MessageEmbed()
         .setTitle(target.username)
         .setDescription(`<@${target.id}>`)
@@ -52,8 +56,13 @@ module.exports = {
       } else {
         embed.addField('Server Permissions', 'Member');
       }
+      if (userLevel) {
+        embed.addField('Level', userLevel.level);
+      } else {
+        embed.addField('Level', 1);
+      }
       if (!warnings) {
-        embed.addField('Server Warnings', `0`);
+        embed.addField('Server Warnings', 0);
       } else {
         embed.addField('Server Warnings', `${warnings}`);
       }

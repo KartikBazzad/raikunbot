@@ -73,10 +73,6 @@ module.exports = {
         components.push(row);
       });
       console.log(components);
-      // banAuditLogs.map((x) => {
-      // });
-      // menu.addOptions(userArray);
-      // const row = new MessageActionRow().addComponents(menu);
       const reply = await message.reply({
         embeds: [embed],
         components: components,
@@ -97,7 +93,6 @@ module.exports = {
             reply.delete();
             break;
           default:
-            console.log(collected.values[0]);
             message.guild.members.unban(collected.values[0]);
             const delete_user = await banned_users.findFirst({
               where: {
@@ -109,14 +104,11 @@ module.exports = {
               try {
                 await banned_users.delete({ where: { id: delete_user.id } });
               } catch (error) {
-                console.log(`Error occured while deleting user from db`);
+                console.log(`Error occured while deleting user from db`, error);
               }
             }
-
             collected.reply('User unbanned successfully');
-
             await wait(5000);
-            console.log('deleting Message');
             return reply.delete();
         }
       });

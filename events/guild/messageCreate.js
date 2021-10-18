@@ -1,6 +1,7 @@
 require('dotenv').config;
 const { PrismaClient } = require('@prisma/client');
-const { members, staffMembers, guilds, users } = new PrismaClient();
+const { members, staffMembers, guildMemberLevels, guilds, users } =
+  new PrismaClient();
 const cooldowns = new Map();
 module.exports = async (Discord, client, message) => {
   try {
@@ -41,6 +42,7 @@ module.exports = async (Discord, client, message) => {
         discordId: message.author.id,
       },
     });
+
     if (!finduser) {
       const newuser = await members.create({
         data: {
@@ -48,6 +50,22 @@ module.exports = async (Discord, client, message) => {
           discordTag: `${message.author.username}#${message.author.discriminator}`,
           discriminator: message.author.discriminator,
         },
+      });
+      const findUserLevels = await guildMemberLevels.findFirst({
+        where: { discordId: message.author.id, guildId: message.guild.id },
+      });
+      if (!findUserLevels) {
+        const newUserLevels = await guildMemberLevels.create({
+          data: { discordId: message.author.id, guildId: message.guild.id },
+        });
+      }
+    }
+    const findUserLevels = await guildMemberLevels.findFirst({
+      where: { discordId: message.author.id, guildId: message.guild.id },
+    });
+    if (!findUserLevels) {
+      const newUserLevels = await guildMemberLevels.create({
+        data: { discordId: message.author.id, guildId: message.guild.id },
       });
     }
     if (!message.content.startsWith(prefix)) return;
