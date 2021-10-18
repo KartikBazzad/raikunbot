@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const { MessageEmbed } = require('discord.js');
-const { staffMembers, banned_users, temp_Banned_users, muted_users } =
+const { staffMembers, banned_users, guilds, temp_Banned_users, muted_users } =
   new PrismaClient();
 const ms = require('ms');
 module.exports = async (Discord, Client, member) => {

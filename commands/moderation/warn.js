@@ -35,6 +35,12 @@ module.exports = {
             '`',
         );
       }
+
+      if (target.id === staffmember.discordId && staffmember.active) {
+        return message.reply(
+          `Tagged user is an active Staff Member. If there is a problem please contact admins for further to resolve the issue`,
+        );
+      }
       const targetUser = message.guild.members.cache.get(target.id);
       console.log(args);
       const targetWarnCount = await warnedUsers.count({
@@ -48,13 +54,12 @@ module.exports = {
       const warnid = nanoid(5);
       console.log(reason);
       const embed = new MessageEmbed()
-        .setAuthor(
-          targetUser.user.username + targetUser.user.discriminator,
-          targetUser.user.displayAvatarURL(),
-        )
-        .setTitle('User Warned')
-        .setFooter('ID: ' + warnid)
+        .setAuthor('Warn-id: ' + warnid)
+        .setTitle('Warning')
+        .setColor('ORANGE')
+        .setFooter(client.user.username, client.user.displayAvatarURL())
         .setTimestamp()
+        .setDescription(`Reason: ${reason}`)
         .addFields([
           { name: 'Warned User', value: `<@${target.id}>`, inline: true },
           {
@@ -62,10 +67,25 @@ module.exports = {
             value: `<@${message.author.id}>`,
             inline: true,
           },
-          { name: 'Reason', value: reason },
         ]);
 
+      const warnedUser = await warnedUsers.create({
+        data: {
+          discordId: target.id,
+          guildId: message.guild.id,
+          warnid: warnid,
+          warningby: staffmember.id,
+          reason: reason,
+        },
+      });
       message.reply({ embeds: [embed] });
+      const guild = await guilds.findUnique({
+        where: { guildId: message.guild.id },
+      });
+      if (guild && guild.logChannel !== null) {
+        const logChannel = message.guild.channels.cache.get(guild.logChannel);
+        logChannel.send({ embeds: [embed] });
+      }
     } catch (error) {
       console.log(error);
     }
