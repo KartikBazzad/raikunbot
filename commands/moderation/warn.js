@@ -65,7 +65,11 @@ module.exports = {
             value: `<@${message.author.id}>`,
             inline: true,
           },
-        ]);
+        ])
+        .addField(
+          '**Note**',
+          'Max no. of warnings for a user is 5, if limit reached user will be kicked from the server',
+        );
 
       const warnedUser = await warnedUsers.create({
         data: {
@@ -90,6 +94,24 @@ module.exports = {
       const warncount = await warnedUsers.count({
         where: { discordId: target.id, guildId: message.guild.id },
       });
+      if (warncount === 5) {
+        const warnembed = new MessageEmbed()
+          .setTitle('Warned User Kicked')
+          .setAuthor(
+            target.username + target.discriminator,
+            targetUser.user.displayAvatarURL(),
+          )
+          .setTimestamp()
+          .setFooter(message.guild.name, message.guild.iconURL())
+          .setDescription('User has reached a max no. of warnings');
+        await target.kick({ reason: 'Max no. of warning reached for user' });
+        if (guild && guild.logChannel !== null) {
+          const logChannel = message.guild.channels.cache.get(guild.logChannel);
+          if (logChannel) {
+            logChannel.send({ embeds: [warnembed] });
+          }
+        }
+      }
       console.log(warncount);
     } catch (error) {
       console.log(error);

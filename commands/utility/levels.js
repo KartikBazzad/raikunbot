@@ -9,7 +9,6 @@ module.exports = {
   aliases: ['scores', 'leaderboard', 'lvls'],
   usage: [],
   example: ['levels'],
-  Permissions: ['ADMINISTRATOR'],
   async execute(message, args, cmd, client, Discord) {
     try {
       const levels = await guildMemberLevels.findMany({

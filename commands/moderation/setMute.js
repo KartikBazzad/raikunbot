@@ -32,7 +32,19 @@ module.exports = {
         .setPlaceholder('Select Mute Role');
       const menuoptions = [];
       roles
-        .filter((role) => role.tags === null)
+        .filter(
+          (role) =>
+            role.tags === null &&
+            !role.permissions.has([
+              'MANAGE_GUILD',
+              'BAN_MEMBERS',
+              'ADMINISTRATOR',
+              'KICK_MEMBERS',
+              'MUTE_MEMBERS',
+              'MANAGE_MESSAGES',
+            ]) &&
+            role.name !== '@everyone',
+        )
         .map((role) => {
           const option = {
             label: role.name,

@@ -7,6 +7,10 @@ module.exports = async (Discord, client) => {
       if (message.guild) {
         let xpToAdd = Math.floor(Math.random() * 15) + 1;
         let getNeededXP = (level) => level * level * 100;
+        const findUser = await guildMemberLevels.findFirst({
+          where: { discordId: message.author.id, guildId: message.guild.id },
+        });
+        if (!findUser) return;
         const user = await guildMemberLevels.updateMany({
           where: { discordId: message.author.id, guildId: message.guild.id },
           data: {

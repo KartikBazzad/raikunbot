@@ -4,6 +4,7 @@ const {
   MessageButton,
   MessageActionRow,
 } = require('discord.js/src/index.js');
+const wait = require('util').promisify(setTimeout);
 const { guilds, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'clear',
@@ -86,7 +87,7 @@ module.exports = {
                 message.channel.bulkDelete(messages);
                 collected.reply('Operation Successfull');
                 if (logChannel) {
-                  return logChannel.send({ embeds: [embed] });
+                  logChannel.send({ embeds: [embed] });
                 }
               })
               .catch((err) => console.log(err));
@@ -94,10 +95,13 @@ module.exports = {
           case 'cancel':
             reply.delete();
             collected.reply('Operation was canceled');
+            await wait(5000);
+            collected.deleteReply();
             break;
         }
       });
     } catch (error) {
+      console.log(error);
       message.reply('Error occured during clearing');
     }
   },

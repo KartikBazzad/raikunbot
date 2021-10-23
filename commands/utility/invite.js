@@ -4,7 +4,7 @@ module.exports = {
   name: 'invite',
   aliases: ['inv', 'botinv'],
   usage: [],
-  examle: ['invite'],
+  example: ['invite'],
   summary: 'Get guild and bot invite links',
   description: 'Provide a link for Server Invite and Bot invite',
   async execute(message, args, cmd, client, Discord) {
