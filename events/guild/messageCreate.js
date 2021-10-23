@@ -5,6 +5,7 @@ const { members, staffMembers, guildMemberLevels, guilds, users } =
 const cooldowns = new Map();
 module.exports = async (Discord, client, message) => {
   try {
+    if (message.author.bot) return;
     const guild = await guilds.findUnique({
       where: { guildId: message.guild.id },
     });
@@ -35,13 +36,21 @@ module.exports = async (Discord, client, message) => {
         },
       });
     }
-    if (message.author.bot) return;
     const prefix = process.env.PREFIX;
     const finduser = await members.findUnique({
       where: {
         discordId: message.author.id,
       },
     });
+    const findStaffMember = message.guild.members.cache.get(message.author.id);
+    if (findStaffMember.permissions.has(['ADMINISTARTOR'])) {
+      const newStaffMember = await staffMembers.findFirst({
+        where: {
+          guildId: message.guild.id,
+          discordId: message.author.id,
+        },
+      });
+    }
 
     if (!finduser) {
       const newuser = await members.create({
@@ -56,7 +65,11 @@ module.exports = async (Discord, client, message) => {
       });
       if (!findUserLevels) {
         const newUserLevels = await guildMemberLevels.create({
-          data: { discordId: message.author.id, guildId: message.guild.id },
+          data: {
+            discordId: message.author.id,
+            exp: 1,
+            guildId: message.guild.id,
+          },
         });
       }
     }
@@ -65,7 +78,11 @@ module.exports = async (Discord, client, message) => {
     });
     if (!findUserLevels) {
       const newUserLevels = await guildMemberLevels.create({
-        data: { discordId: message.author.id, guildId: message.guild.id },
+        data: {
+          discordId: message.author.id,
+          exp: 1,
+          guildId: message.guild.id,
+        },
       });
     }
     if (!message.content.startsWith(prefix)) return;
@@ -76,17 +93,9 @@ module.exports = async (Discord, client, message) => {
       client.commands.find((a) => a.aliases && a.aliases.includes(cmd));
 
     if (!command) return;
-    if (command.guildOnly && message.channel.type === 'dm') {
+    if (command.guildOnly && message.channel.type === 'DM') {
       return message.reply(`I can't execute that command inside DMs!`);
     }
-    // if (command.staff) {
-    //   const staff = await staffMembers.findFirst({
-    //     where: { discordId: message.author.id, guildId: message.guild.id },
-    //   });
-
-    //   if (!staff)
-    //     return message.reply('You are not authorized to use this Command');
-    // }
     if (command.args && !args.length) {
       let reply = `You didn't provide any arguments, ${message.author}!`;
       if (command.usage) {

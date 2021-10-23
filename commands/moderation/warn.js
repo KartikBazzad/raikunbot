@@ -4,8 +4,8 @@ const { staffMembers, guilds, warnedUsers } = new PrismaClient();
 const { nanoid } = require('nanoid');
 module.exports = {
   name: 'warn',
-  description: '',
-  summary: '',
+  description: 'Give a warning to the user',
+  summary: 'Give a warning to the user',
   usage: ['[user] [reason]'],
   example: ['warn [user] bad behaviour'],
   staffOnly: true,
@@ -51,7 +51,7 @@ module.exports = {
       });
       console.log(targetWarnCount);
       const reason = args.slice(1).join(' ');
-      const warnid = nanoid(5);
+      const warnid = nanoid(7).toLowerCase();
       console.log(reason);
       const embed = new MessageEmbed()
         .setAuthor('Warn-id: ' + warnid)

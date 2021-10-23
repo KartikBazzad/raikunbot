@@ -136,6 +136,6 @@ model GuildMemberLevels {
   guildId    String
   guild      Guilds  @relation(fields: [guildId], references: [guildId])
   level      Int     @default(1)
-  exp        BigInt  @default(0)
-  requiredXp BigInt  @default(100)
+  exp        Int     @default(0)
+  requiredXp Int     @default(100)
 }
