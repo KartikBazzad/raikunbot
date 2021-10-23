@@ -5,7 +5,6 @@ const { MessageEmbed } = require('discord.js');
 //  Search if the guild exits if exits update it else create new
 module.exports = async (Discord, Client, guild) => {
   const joinLog = await guild.fetchAuditLogs({ limit: 1, type: 'BOT_ADD' });
-  console.log(joinLog.entries.first());
   const { target, executor } = joinLog.entries.first();
   try {
     const oldUser = await users.findUnique({
