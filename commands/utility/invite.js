@@ -21,7 +21,7 @@ module.exports = {
           `&permissions=8&scope=bot`,
       )
       .setStyle('LINK');
-    btn1.setURL(`https://discord.gg/gPAzUs3NY5`);
+    btn1.setURL(`https://discord.gg/gtqtTzXD3d`);
     const row = new MessageActionRow().addComponents([btn1, btn2, btn3]);
     try {
       if (message.channel.type === 'DM') {
