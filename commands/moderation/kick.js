@@ -23,7 +23,6 @@ module.exports = {
           return message.reply('You are not authorized to use this Command');
       }
       const target = message.mentions.members.first();
-      console.log(target);
       const targetUser = client.users.cache.get(target.id);
       const targetperms = message.channel.permissionsFor(targetUser);
       if (targetperms.has('ADMINISTRATOR')) {

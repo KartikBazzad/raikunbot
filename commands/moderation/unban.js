@@ -41,7 +41,6 @@ module.exports = {
         .setFooter(client.user.username, client.user.displayAvatarURL());
       const banAuditLogs = (await message.guild.bans.fetch()).toJSON();
 
-      console.log(typeof banAuditLogs);
       if (banAuditLogs.size === 0) {
         return message.reply('No member to unban');
       }
@@ -72,7 +71,6 @@ module.exports = {
         let row = new MessageActionRow().addComponents(menu);
         components.push(row);
       });
-      console.log(components);
       const reply = await message.reply({
         embeds: [embed],
         components: components,

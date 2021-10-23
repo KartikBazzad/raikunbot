@@ -31,11 +31,11 @@ module.exports = {
           where: { guildId: message.guild.id },
           data: { logChannel: null },
         });
-        message.reply(`Successfully removed the Log Channel`);
+        return message.reply(`Successfully removed the Log Channel`);
       }
     } catch (error) {
       console.log(error);
-      message.reply('error occured, pls try again later');
+      return message.reply('error occured, pls try again later');
     }
   },
 };

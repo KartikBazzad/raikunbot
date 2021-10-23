@@ -34,7 +34,7 @@ module.exports = {
           where: { guildId: message.guild.id },
           data: { logChannel: channelId },
         });
-        message.reply(`<#${channelId}> set as Log Channel`);
+        return message.reply(`<#${channelId}> set as Log Channel`);
       }
     } catch (error) {
       message.reply('Error occured, Dev team notified');

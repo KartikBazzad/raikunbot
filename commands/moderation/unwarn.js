@@ -68,7 +68,6 @@ module.exports = {
           value: `${warning.warnid}`,
           description: `Reason: ${warning.reason}`,
         };
-        console.log({ warning });
         menuOptions.push(option);
       });
 

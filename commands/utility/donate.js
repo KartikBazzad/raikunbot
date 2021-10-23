@@ -4,7 +4,6 @@ module.exports = {
   name: 'donate',
   aliases: [],
   usage: [],
-  guildOnly: true,
   examle: ['donate'],
   summary: 'Get the Pateron link to donate',
   description: 'Provide a link for Donate link for the bot',

@@ -37,18 +37,28 @@ module.exports = {
 
       const embed = new MessageEmbed()
         .setTitle(`${list.guildName}`)
-        .setDescription('List of Staff Members')
+
         .setColor('AQUA')
         .setThumbnail(message.guild.iconURL({ dynamic: true }));
+
       if (list.staffMembers.length) {
-        list.staffMembers
-          .filter((x) => x.active === true)
-          .map((x) => {
-            embed.addField(
-              `${list.staffMembers.indexOf(x) + 1}`,
-              `<@${x.discordId}>`,
-            );
-          });
+        let y = 0;
+        if (args[0] === 'demoted') {
+          embed.setDescription('List of Demoted Staff Members');
+          list.staffMembers
+
+            .filter((x) => !x.active)
+            .map((x) => {
+              embed.addField(`${++y}`, `<@${x.discordId}>`);
+            });
+        } else {
+          embed.setDescription('List of Active Staff Members');
+          list.staffMembers
+            .filter((x) => x.active === true)
+            .map((x) => {
+              embed.addField(`${++y}`, `<@${x.discordId}>`);
+            });
+        }
       } else {
         embed.addField(
           `${list.staffMembers.length}`,

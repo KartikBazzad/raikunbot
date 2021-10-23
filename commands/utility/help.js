@@ -56,13 +56,13 @@ module.exports = {
     try {
       menu.addOptions(options);
       const row = new MessageActionRow().addComponents(menu);
-      const reply = await client.users.cache.get(message.author.id).send({
+      await client.users.cache.get(message.author.id).send({
         embeds: [embed],
         components: [row],
       });
       const filter = (interaction) =>
         interaction.isSelectMenu() && interaction.user.id === message.author.id;
-      const collector = client.users.cache
+      const collector = await client.users.cache
         .get(message.author.id)
         .dmChannel.createMessageComponentCollector({
           filter,
@@ -100,7 +100,9 @@ module.exports = {
           newembed.addField('Example', prefix + command.name);
         }
 
-        await wait(3000);
+        await wait(1000);
+        collected.editReply('Done...');
+        await wait(2000);
         collected.editReply({
           embeds: [newembed],
           components: [row],

@@ -89,11 +89,11 @@ module.exports = {
       embed.addField('`Reason`:', `${args[1]}`);
 
       const logchannel = client.channels.cache.get(guild.logChannel);
-      logchannel.send({ embeds: [embed] });
+      if (!logchannel) return;
+      return logchannel.send({ embeds: [embed] });
     } catch (error) {
       console.log(error);
-      message.channel.send('Error Occured');
-      return null;
+      return message.channel.send('Error Occured, dev team notified');
     }
   },
 };

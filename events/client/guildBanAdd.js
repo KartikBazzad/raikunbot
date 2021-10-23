@@ -1,3 +1,1 @@
-module.exports = (Discord, client, member) => {
-  console.log(member);
-};
+module.exports = (Discord, client, member) => {};

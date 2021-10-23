@@ -6,6 +6,7 @@ module.exports = {
   summary: 'Display Server Info',
   description: 'Display the server info',
   aliases: ['sinfo'],
+  guildOnly: true,
   usage: [],
   example: ['server', 'sinfo'],
   async execute(message, args, cmd, client, Discord) {

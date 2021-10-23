@@ -117,23 +117,21 @@ module.exports = {
           default:
             embed.addField(`Duration`, `${ms(ms(args[1]), { long: true })}`);
             const roles = [];
-            try {
-              user.roles.cache.map((role) => {
-                if (role.name === '@everyone') return;
-                roles.push(role.id);
-                user.roles.remove(role.id);
+
+            user.roles.cache.map((role) => {
+              if (role.name === '@everyone') return;
+              roles.push(role.id);
+              user.roles.remove(role.id);
+            });
+            user.roles.add(muteRole);
+            message.guild.channels.cache.map((ch) => {
+              ch.permissionOverwrites.edit(user.id, {
+                CONNECT: false,
+                SEND_MESSAGES: false,
+                VIEW_CHANNEL: true,
               });
-              user.roles.add(muteRole);
-              message.guild.channels.cache.map((ch) => {
-                ch.permissionOverwrites.edit(user.id, {
-                  CONNECT: false,
-                  SEND_MESSAGES: false,
-                  VIEW_CHANNEL: true,
-                });
-              });
-            } catch (error) {
-              console.log(error);
-            }
+            });
+
             const member = await muted_users.create({
               data: {
                 discordId: target.id,
@@ -148,10 +146,9 @@ module.exports = {
               'User muted for ' + ms(ms(args[1]), { long: true }),
             );
 
-            if (!logChannel) {
-              return;
-            } else {
-              const logchannel = client.channels.cache.get(logChannel);
+            if (!logChannel) return;
+            const logchannel = client.channels.cache.get(logChannel);
+            if (logchannel) {
               logchannel.send({ embeds: [embed] });
             }
             setTimeout(() => {
@@ -159,7 +156,6 @@ module.exports = {
             }, 3000);
             setTimeout(async () => {
               user.roles.remove(muteRole);
-              console.log(member.roles);
               message.guild.channels.cache.map((ch) => {
                 ch.permissionOverwrites.edit(user.id, {
                   CONNECT: true,
@@ -178,7 +174,11 @@ module.exports = {
                   id: member.id,
                 },
               });
-              console.log(`member deleted from db and has been unmuted`);
+              if (logchannel) {
+                logchannel.send(
+                  `User: ${target} has been unmuted successfully`,
+                );
+              }
               message.channel.send(
                 `User: ${target} has been unmuted successfully`,
               );

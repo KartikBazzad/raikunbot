@@ -16,7 +16,6 @@ module.exports = {
   ],
   async execute(message, args, cmd, client, discord) {
     try {
-      console.log(ms(args[1]));
       if (!args.length)
         return message.reply('Tag the user you want to ban temprarily');
       if (!args[1]) return message.reply('Provide a time duration');
@@ -53,7 +52,6 @@ module.exports = {
         args[2] = `No reason specified`;
       } else {
         args[2] = args.slice(2).join(' ');
-        console.log(args[2]);
       }
       target.ban({ reason: args[2] }).then(async () => {
         const user = await temp_Banned_users.create({
@@ -95,7 +93,9 @@ module.exports = {
         embed.addField('`Reason`:', `${args[2]}`);
 
         const logChannel = client.channels.cache.get(guild.logChannel);
-        logChannel.send({ embeds: [embed] });
+        if (logChannel) {
+          logChannel.send({ embeds: [embed] });
+        }
         setTimeout(async () => {
           const newembed = new MessageEmbed()
             .setAuthor(
@@ -127,16 +127,15 @@ module.exports = {
               bannedBy: message.author.id,
             },
           });
-          logChannel.send({ embeds: [newembed] });
+          if (logChannel) {
+            logChannel.send({ embeds: [newembed] });
+          }
           return message.channel.send(`user ${targetUser} has been unbanned`);
         }, ms(args[1]));
       });
     } catch (error) {
       console.log(error);
-      if (error) {
-        message.reply('Could not Ban the user due to error', error);
-        return null;
-      }
+      return message.reply('Error occured, Dev team notified');
     }
   },
 };

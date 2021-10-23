@@ -42,14 +42,12 @@ module.exports = {
         );
       }
       const targetUser = message.guild.members.cache.get(target.id);
-      console.log(args);
       const targetWarnCount = await warnedUsers.count({
         where: {
           discordId: target.id,
           guildId: message.guild.id,
         },
       });
-      console.log(targetWarnCount);
       const reason = args.slice(1).join(' ');
       const warnid = nanoid(7).toLowerCase();
       console.log(reason);
@@ -84,8 +82,15 @@ module.exports = {
       });
       if (guild && guild.logChannel !== null) {
         const logChannel = message.guild.channels.cache.get(guild.logChannel);
-        logChannel.send({ embeds: [embed] });
+        if (logChannel) {
+          logChannel.send({ embeds: [embed] });
+        }
       }
+
+      const warncount = await warnedUsers.count({
+        where: { discordId: target.id, guildId: message.guild.id },
+      });
+      console.log(warncount);
     } catch (error) {
       console.log(error);
     }

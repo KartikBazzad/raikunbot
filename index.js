@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const { Client, Intents, Collection } = require('discord.js');
+const levels = require('./functions/levels');
 require('dotenv').config();
 const client = new Client({
   intents: [
@@ -19,27 +20,12 @@ client.commands = new Collection();
 ['eventshandler', 'commandhandler'].forEach((handler) => {
   require(`./handlers/${handler}`)(client, Discord);
 });
-
-const { PrismaClient } = require('@prisma/client');
-const { MessageEmbed } = require('discord.js');
-const { staffMembers, banned_users, guilds, temp_Banned_users, muted_users } =
-  new PrismaClient();
-const ms = require('ms');
-
-client.on('messageCreate', async (message) => {});
-
-client.on('guildMemberRemove', async (member) => {
-  const fetchKickLogs = await member.guild.fetchAuditLogs({
-    type: 'MEMBER_KICK',
-    limit: 10,
-  });
-  const { executor, target } = fetchKickLogs.entries
-    .filter((x) => x.target.id === member.user.id)
-    .first();
-});
 client.on('ready', async () => {
   console.log(`Bot: ${client.user.username} is ready`);
+  levels(Discord, client);
 });
+
+client.on('messageCreate', async (message) => {});
 
 client.login(process.env.BOT_TOKEN);
 

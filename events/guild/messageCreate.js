@@ -6,60 +6,77 @@ const cooldowns = new Map();
 module.exports = async (Discord, client, message) => {
   try {
     if (message.author.bot) return;
-    const guild = await guilds.findUnique({
-      where: { guildId: message.guild.id },
-    });
-    if (!guild) {
-      const fetchlogs = await message.guild
-        .fetchAuditLogs({ type: 'BOT_ADD' })
-        .entries.filter((log) => log.target.id === client.application.id)
-        .first();
-      const { executor, target } = fetchlogs;
-      const user = await users.findUnique({
-        where: { discordId: fetchlogs.executor.id },
+    const prefix = process.env.PREFIX;
+    if (message.guild) {
+      const guild = await guilds.findUnique({
+        where: { guildId: message.guild.id },
       });
-      if (!user) {
-        const createNewUser = await users.create({
+      if (!guild) {
+        const fetchlogs = await message.guild
+          .fetchAuditLogs({ type: 'BOT_ADD' })
+          .entries.filter((log) => log.target.id === client.application.id)
+          .first();
+        const { executor, target } = fetchlogs;
+        const user = await users.findUnique({
+          where: { discordId: fetchlogs.executor.id },
+        });
+        if (!user) {
+          const createNewUser = await users.create({
+            data: {
+              discordId: fetchlogs.executor.id,
+              discordTag: executor.username + executor.discriminator,
+              avatar: executor.avatar,
+              discriminator: executor.discriminator,
+            },
+          });
+        }
+        const newguild = await guilds.create({
           data: {
-            discordId: fetchlogs.executor.id,
-            discordTag: executor.username + executor.discriminator,
-            avatar: executor.avatar,
-            discriminator: executor.discriminator,
+            guildId: message.guild.id,
+            guildName: message.guild.name,
+            invitedBy: executor.id,
           },
         });
       }
-      const newguild = await guilds.create({
-        data: {
-          guildId: message.guild.id,
-          guildName: message.guild.name,
-          invitedBy: executor.id,
-        },
-      });
-    }
-    const prefix = process.env.PREFIX;
-    const finduser = await members.findUnique({
-      where: {
-        discordId: message.author.id,
-      },
-    });
-    const findStaffMember = message.guild.members.cache.get(message.author.id);
-    if (findStaffMember.permissions.has(['ADMINISTARTOR'])) {
-      const newStaffMember = await staffMembers.findFirst({
-        where: {
-          guildId: message.guild.id,
-          discordId: message.author.id,
-        },
-      });
-    }
 
-    if (!finduser) {
-      const newuser = await members.create({
-        data: {
+      const finduser = await members.findUnique({
+        where: {
           discordId: message.author.id,
-          discordTag: `${message.author.username}#${message.author.discriminator}`,
-          discriminator: message.author.discriminator,
         },
       });
+      const findStaffMember = message.guild.members.cache.get(
+        message.author.id,
+      );
+      if (findStaffMember.permissions.has(['ADMINISTARTOR'])) {
+        const newStaffMember = await staffMembers.findFirst({
+          where: {
+            guildId: message.guild.id,
+            discordId: message.author.id,
+          },
+        });
+      }
+
+      if (!finduser) {
+        const newuser = await members.create({
+          data: {
+            discordId: message.author.id,
+            discordTag: `${message.author.username}#${message.author.discriminator}`,
+            discriminator: message.author.discriminator,
+          },
+        });
+        const findUserLevels = await guildMemberLevels.findFirst({
+          where: { discordId: message.author.id, guildId: message.guild.id },
+        });
+        if (!findUserLevels) {
+          const newUserLevels = await guildMemberLevels.create({
+            data: {
+              discordId: message.author.id,
+              exp: 1,
+              guildId: message.guild.id,
+            },
+          });
+        }
+      }
       const findUserLevels = await guildMemberLevels.findFirst({
         where: { discordId: message.author.id, guildId: message.guild.id },
       });
@@ -72,18 +89,6 @@ module.exports = async (Discord, client, message) => {
           },
         });
       }
-    }
-    const findUserLevels = await guildMemberLevels.findFirst({
-      where: { discordId: message.author.id, guildId: message.guild.id },
-    });
-    if (!findUserLevels) {
-      const newUserLevels = await guildMemberLevels.create({
-        data: {
-          discordId: message.author.id,
-          exp: 1,
-          guildId: message.guild.id,
-        },
-      });
     }
     if (!message.content.startsWith(prefix)) return;
     const args = message.content.slice(prefix.length).split(/ +/);
