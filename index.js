@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const { Client, Intents, Collection } = require('discord.js');
 const levels = require('./functions/levels');
+
 require('dotenv').config();
 const client = new Client({
   intents: [
@@ -23,6 +24,15 @@ client.commands = new Collection();
 client.on('ready', async () => {
   console.log(`Bot: ${client.user.username} is ready`);
   levels(Discord, client);
+  client.user.setStatus('online');
+  client.user.setPresence({
+    activities: [
+      {
+        type: 'LISTENING',
+        name: `${client.users.cache.size} users | ${process.env.PREFIX}help for more info`,
+      },
+    ],
+  });
 });
 
 client.login(process.env.BOT_TOKEN);
