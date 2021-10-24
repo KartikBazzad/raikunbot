@@ -4,6 +4,7 @@ const { staffMembers, guilds } = new PrismaClient();
 module.exports = {
   name: 'kick',
   staffOnly: true,
+  aliases: [],
   guildOnly: true,
   summary: 'Kick user from the guild',
   description:

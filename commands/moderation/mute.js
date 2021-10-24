@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const { muted_users, guilds, banned_users, staffMembers } = new PrismaClient();
 module.exports = {
   name: 'mute',
+  aliases: [],
   description:
     'Mute a user for Server, this will remove permissions to send message from the user, the user can still view all the channels but wont be able to send messages in the channel, to unmute the user use unmute command',
   summary: 'Mute a user from the server',

@@ -4,6 +4,7 @@ const { staffMembers, guilds, warnedUsers } = new PrismaClient();
 const { nanoid } = require('nanoid');
 module.exports = {
   name: 'warn',
+  aliases: [],
   description: 'Give a warning to the user',
   summary: 'Give a warning to the user',
   usage: ['[user] [reason]'],

@@ -2,13 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const wait = require('util').promisify(setTimeout);
 const { temp_Banned_users, guilds, banned_users, staffMembers } =
   new PrismaClient();
-const {
-  MessageActionRow,
-  MessageSelectMenu,
-  MessageEmbed,
-  MessageButton,
-} = require('discord.js');
-const lodash = require('lodash');
+const { MessageEmbed } = require('discord.js');
 module.exports = {
   name: 'unban',
   aliases: ['ub'],
@@ -60,12 +54,19 @@ module.exports = {
         .setTimestamp();
 
       message.guild.members.unban(args[0]);
-      const banned_user = await banned_users.deleteMany({
-        where: {
-          discordId: args[0],
-          guildId: message.guild.id,
-        },
+      const bannedUser = await banned_users.findFirst({
+        where: { discordId: args[0], guildId: message.guild.id },
       });
+      const tempBannedUser = await temp_Banned_users.findFirst({
+        where: { discordId: args[0], guildId: message.guild.id },
+      });
+      if (bannedUser) {
+        await banned_users.delete({ where: { id: bannedUser.id } }); // delete user record from Permanently banned users table
+      }
+      if (tempBannedUser) {
+        await temp_Banned_users.delete({ where: { id: tempBannedUser.id } }); // delete user record from temp banned users table
+      }
+
       if (guild.logChannel === null) return;
       const logChannel = client.channels.cache.get(guild.logChannel);
       if (logChannel) {
