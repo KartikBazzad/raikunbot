@@ -56,10 +56,10 @@ module.exports = {
       } else {
         embed.addField('Server Permissions', 'Member');
       }
-      if (userLevel) {
-        embed.addField('Level', userLevel.level);
+      if (!userLevel) {
+        embed.addField('Level', `${1}`);
       } else {
-        embed.addField('Level', 1);
+        embed.addField('Level', userLevel.level);
       }
       if (!warnings) {
         embed.addField('Server Warnings', 0);
