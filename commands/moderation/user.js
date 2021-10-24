@@ -59,13 +59,9 @@ module.exports = {
       if (!userLevel) {
         embed.addField('Level', `${1}`);
       } else {
-        embed.addField('Level', userLevel.level);
+        embed.addField('Level', `${userLevel.level.toString()}`);
       }
-      if (!warnings) {
-        embed.addField('Server Warnings', 0);
-      } else {
-        embed.addField('Server Warnings', `${warnings}`);
-      }
+      embed.addField('Server Warnings', `${warnings}`);
       if (u.premiumSinceTimestamp != null) {
         embed.addField(
           'Server Boosting Since',
