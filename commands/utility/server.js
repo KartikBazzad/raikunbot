@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js/src/index.js');
 const { PrismaClient } = require('@prisma/client');
-const { guilds, staffMembers } = new PrismaClient();
+const { guilds } = new PrismaClient();
 module.exports = {
   name: 'server',
   summary: 'Display Server Info',

@@ -4,7 +4,7 @@ module.exports = {
   name: 'donate',
   aliases: [],
   usage: [],
-  examle: ['donate'],
+  example: ['donate'],
   summary: 'Get the Pateron link to donate',
   description: 'Provide a link for Donate link for the bot',
   async execute(message, args, cmd, client, Discord) {
