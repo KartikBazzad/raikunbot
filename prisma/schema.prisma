@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -27,6 +26,7 @@ model Guilds {
   guildName         String              @db.LongText
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
+  levels            Boolean             @default(false)
   user              Users               @relation(fields: [invitedBy], references: [discordId])
   invitedBy         String
   logChannel        String?
