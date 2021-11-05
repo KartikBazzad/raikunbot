@@ -107,6 +107,12 @@ module.exports = {
               new Date(message.guild.createdTimestamp).toLocaleDateString() +
               ' `',
           },
+          {
+            name: 'Log Channel',
+            value: `${
+              Guild.logChannel ? '<#' + Guild.logChannel + '>' : 'Not Set'
+            }`,
+          },
         ])
         .setFooter(` ServerID: ${message.guild.id}`)
         .setThumbnail(message.guild.iconURL())
