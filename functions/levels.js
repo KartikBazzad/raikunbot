@@ -8,7 +8,8 @@ module.exports = async (Discord, client) => {
         const guild = await guilds.findUnique({
           where: { guildId: message.guild.id },
         });
-        if (guild.levels) {
+        if (!guild) return;
+        if (guild.levels === true) {
           let xpToAdd = Math.floor(Math.random() * 15) + 1;
           let getNeededXP = (level) => level * level * 100;
           const findUser = await guildMemberLevels.findFirst({
@@ -23,6 +24,7 @@ module.exports = async (Discord, client) => {
               },
             },
           });
+
           const result = await guildMemberLevels
             .findFirst({
               where: {
