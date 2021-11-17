@@ -1,7 +1,15 @@
 require('dotenv').config;
-const { PrismaClient } = require('@prisma/client');
-const { members, staffMembers, guildMemberLevels, guilds, users } =
-  new PrismaClient();
+const {
+  PrismaClient
+} = require('@prisma/client');
+const {
+  members,
+  staffMembers,
+  guildMemberLevels,
+  guilds,
+  users
+} =
+new PrismaClient();
 const cooldowns = new Map();
 module.exports = async (Discord, client, message) => {
   try {
@@ -9,16 +17,26 @@ module.exports = async (Discord, client, message) => {
     const prefix = process.env.PREFIX;
     if (message.guild) {
       const guild = await guilds.findUnique({
-        where: { guildId: message.guild.id },
+        where: {
+          guildId: message.guild.id
+        },
       });
       if (!guild) {
         const fetchlogs = await message.guild
-          .fetchAuditLogs({ type: 'BOT_ADD' })
+          .fetchAuditLogs({
+            type: 'BOT_ADD'
+          })
           .entries.filter((log) => log.target.id === client.application.id)
           .first();
-        const { executor, target } = fetchlogs;
+
+        const {
+          executor,
+          target
+        } = fetchlogs;
         const user = await users.findUnique({
-          where: { discordId: fetchlogs.executor.id },
+          where: {
+            discordId: fetchlogs.executor.id
+          },
         });
         if (!user) {
           const createNewUser = await users.create({
@@ -47,7 +65,7 @@ module.exports = async (Discord, client, message) => {
       const findStaffMember = message.guild.members.cache.get(
         message.author.id,
       );
-      if (findStaffMember.permissions.has(['ADMINISTARTOR'])) {
+      if (findStaffMember.permissions.has([Discord.Permissions.FLAGS.ADMINISTRATOR])) {
         const newStaffMember = await staffMembers.findFirst({
           where: {
             guildId: message.guild.id,
@@ -65,7 +83,10 @@ module.exports = async (Discord, client, message) => {
           },
         });
         const findUserLevels = await guildMemberLevels.findFirst({
-          where: { discordId: message.author.id, guildId: message.guild.id },
+          where: {
+            discordId: message.author.id,
+            guildId: message.guild.id
+          },
         });
         if (!findUserLevels) {
           const newUserLevels = await guildMemberLevels.create({
@@ -78,7 +99,10 @@ module.exports = async (Discord, client, message) => {
         }
       }
       const findUserLevels = await guildMemberLevels.findFirst({
-        where: { discordId: message.author.id, guildId: message.guild.id },
+        where: {
+          discordId: message.author.id,
+          guildId: message.guild.id
+        },
       });
       if (!findUserLevels) {
         const newUserLevels = await guildMemberLevels.create({
